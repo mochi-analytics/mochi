@@ -29,6 +29,20 @@
   --badge-leave-fg: #8f2d2d;
 }
 
+/*
+ * Native <select> popups don't reliably follow the page's color-scheme in
+ * every browser; explicit option colors keep the list readable in both themes.
+ */
+select option {
+  background-color: #ffffff;
+  color: #18181b;
+}
+
+.dark select option {
+  background-color: #18181b;
+  color: #f4f4f5;
+}
+
 .dark {
   color-scheme: dark;
   --viz-commands: #3987e5;
