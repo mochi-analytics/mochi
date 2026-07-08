@@ -16,7 +16,7 @@ services:
       MIGRATE_ON_START: "1"
       RETENTION_CLEANUP: "1"
     ports:
-      - "3000:3000"
+      - "3000"
     healthcheck:
       test:
         [
