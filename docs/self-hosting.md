@@ -24,12 +24,7 @@ CLICKHOUSE_PASSWORD=...
 
 The databases keep their data in named volumes.
 
-The compose file uses the published GHCR image by default. To pin a specific
-release, set `MOCHI_IMAGE_TAG` in your `.env` file, for example:
-
-```env
-MOCHI_IMAGE_TAG=mochi-v0.2.1
-```
+The compose file uses the published GHCR image tagged `latest`.
 
 Open `http://your-host:3000`. The first visit walks you through creating the
 admin account. Put a TLS-terminating reverse proxy (Caddy, nginx, Traefik) in
@@ -47,7 +42,6 @@ to `0` to manage these yourself.
 | `CLICKHOUSE_URL` / `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` / `CLICKHOUSE_DB` | ClickHouse connection |
 | `MIGRATE_ON_START` | `1` = apply migrations at boot |
 | `RETENTION_CLEANUP` | `1` = daily retention cleanup |
-| `MOCHI_IMAGE_TAG` | Optional Docker image tag, defaults to `latest` |
 
 ## Upgrading
 
