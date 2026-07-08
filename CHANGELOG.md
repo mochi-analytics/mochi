@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.3](https://github.com/mochi-analytics/mochi/compare/mochi-v0.2.2...mochi-v0.2.3) (2026-07-08)
+
+
+### Bug Fixes
+
+* align self-hosting docs with latest image tag ([254de54](https://github.com/mochi-analytics/mochi/commit/254de54b06a8de62833732ee64201139839e78f5))
+* update Docker image tag to use 'latest' directly ([b5b0cdf](https://github.com/mochi-analytics/mochi/commit/b5b0cdfc26e7fa7b5aa677d2a804f305c340618f))
+
 ## [0.2.2](https://github.com/mochi-analytics/mochi/compare/mochi-v0.2.1...mochi-v0.2.2) (2026-07-08)
 
 
