@@ -1,4 +1,5 @@
 import { RangePicker } from "@/components/range-picker";
+import { getCurrentUser } from "@/lib/auth/session";
 import { formatNumber, formatRelative } from "@/lib/format";
 import { getCustomEventSummary, getRecentEvents, parseRange } from "@/lib/queries";
 
@@ -12,7 +13,8 @@ export default async function EventsPage({
   searchParams: Promise<{ range?: string }>;
 }) {
   const { botId } = await params;
-  const range = parseRange((await searchParams).range);
+  const user = await getCurrentUser();
+  const range = parseRange((await searchParams).range, user?.defaultRange);
   const [summary, recent] = await Promise.all([
     getCustomEventSummary(botId, range),
     getRecentEvents(botId, { types: ["custom"], limit: 50 }),

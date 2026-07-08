@@ -1,7 +1,10 @@
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getAccessibleBot } from "@/lib/auth/access";
 import { getCurrentUser, type SessionUser } from "@/lib/auth/session";
+import { db } from "@/lib/db";
+import { teams } from "@/lib/db/schema";
 
 export function jsonError(status: number, message: string) {
   return NextResponse.json({ error: message }, { status });
@@ -59,6 +62,35 @@ export async function requireBotWrite(botId: string): Promise<
     return { response: jsonError(403, "Read-only access") };
   }
   return access;
+}
+
+type Team = typeof teams.$inferSelect;
+
+/**
+ * Resolves a team owned by the authenticated user. Returns the team, or a
+ * ready-to-return 401/403/404 response. Use in team-management handlers where
+ * only the owner may act (rename, manage members, delete).
+ */
+export async function requireTeamOwner(
+  teamId: string,
+): Promise<{ user: SessionUser; team: Team } | { response: NextResponse }> {
+  const auth = await requireUser();
+  if ("response" in auth) return auth;
+
+  if (!z.string().uuid().safeParse(teamId).success) {
+    return { response: jsonError(404, "Team not found") };
+  }
+
+  const [team] = await db
+    .select()
+    .from(teams)
+    .where(eq(teams.id, teamId))
+    .limit(1);
+  if (!team) return { response: jsonError(404, "Team not found") };
+  if (team.ownerUserId !== auth.user.id) {
+    return { response: jsonError(403, "Only the team owner can do that") };
+  }
+  return { user: auth.user, team };
 }
 
 export async function parseBody<T extends z.ZodTypeAny>(

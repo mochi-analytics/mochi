@@ -1,4 +1,5 @@
 import { RangePicker } from "@/components/range-picker";
+import { getCurrentUser } from "@/lib/auth/session";
 import { formatNumber, formatRelative } from "@/lib/format";
 import { getRecentGuildChanges, getTopGuilds, parseRange } from "@/lib/queries";
 
@@ -12,7 +13,8 @@ export default async function GuildsPage({
   searchParams: Promise<{ range?: string }>;
 }) {
   const { botId } = await params;
-  const range = parseRange((await searchParams).range);
+  const user = await getCurrentUser();
+  const range = parseRange((await searchParams).range, user?.defaultRange);
   const [topGuilds, changes] = await Promise.all([
     getTopGuilds(botId, range),
     getRecentGuildChanges(botId),

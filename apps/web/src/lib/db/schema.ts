@@ -14,6 +14,14 @@ export const users = pgTable("users", {
   role: text("role", { enum: ["admin", "user", "viewer"] })
     .notNull()
     .default("user"),
+  // IANA timezone used to render this user's dashboards
+  timezone: text("timezone").notNull().default("UTC"),
+  // preset date range applied when a page has no explicit ?range=
+  defaultRange: text("default_range", {
+    enum: ["24h", "7d", "30d", "90d"],
+  })
+    .notNull()
+    .default("30d"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -58,6 +66,12 @@ export const botSettings = pgTable("bot_settings", {
 export const teams = pgTable("teams", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull().unique(),
+  // the user who created the team; only they can manage/delete it
+  ownerUserId: uuid("owner_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  // shareable code others enter to join the team
+  accessCode: text("access_code").notNull().unique(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

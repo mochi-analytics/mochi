@@ -7,15 +7,37 @@ import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 
+const timezoneSchema = z.string().refine(
+  (tz) => {
+    try {
+      // throws RangeError for an unknown IANA timezone
+      Intl.DateTimeFormat(undefined, { timeZone: tz });
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  { message: "Unknown timezone" },
+);
+
+const rangeSchema = z.enum(["24h", "7d", "30d", "90d"]);
+
 const patchSchema = z
   .object({
     username: usernameSchema.optional(),
     currentPassword: z.string().min(1).max(128).optional(),
     newPassword: passwordSchema.optional(),
+    timezone: timezoneSchema.optional(),
+    defaultRange: rangeSchema.optional(),
   })
-  .refine((v) => v.username !== undefined || v.newPassword !== undefined, {
-    message: "Provide a username or password to update",
-  })
+  .refine(
+    (v) =>
+      v.username !== undefined ||
+      v.newPassword !== undefined ||
+      v.timezone !== undefined ||
+      v.defaultRange !== undefined,
+    { message: "Provide a setting to update" },
+  )
   .refine((v) => !v.newPassword || v.currentPassword, {
     message: "Current password is required",
     path: ["currentPassword"],
@@ -29,9 +51,12 @@ export async function PATCH(req: Request) {
   if ("response" in parsed) return parsed.response;
 
   const nextUsername = parsed.data.username?.toLowerCase();
-  const { currentPassword, newPassword } = parsed.data;
+  const { currentPassword, newPassword, timezone, defaultRange } = parsed.data;
 
   const updates: Partial<typeof users.$inferInsert> = {};
+
+  if (timezone !== undefined) updates.timezone = timezone;
+  if (defaultRange !== undefined) updates.defaultRange = defaultRange;
 
   if (nextUsername && nextUsername !== auth.user.username) {
     const [existing] = await db

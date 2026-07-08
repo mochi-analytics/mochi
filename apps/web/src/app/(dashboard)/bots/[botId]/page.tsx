@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { OverviewDashboard } from "@/components/overview-dashboard";
+import { getCurrentUser } from "@/lib/auth/session";
 import { parseRange } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +13,8 @@ export default async function BotOverviewPage({
   searchParams: Promise<{ range?: string }>;
 }) {
   const { botId } = await params;
-  const range = parseRange((await searchParams).range);
+  const user = await getCurrentUser();
+  const range = parseRange((await searchParams).range, user?.defaultRange);
 
   return (
     <OverviewDashboard

@@ -5,6 +5,7 @@ import { listTeamsWithMembersAndBots } from "@/lib/admin";
 import { jsonError, parseBody, requireAdmin } from "@/lib/api";
 import { db } from "@/lib/db";
 import { teams } from "@/lib/db/schema";
+import { generateAccessCode } from "@/lib/teams";
 
 export async function GET() {
   const auth = await requireAdmin();
@@ -34,7 +35,11 @@ export async function POST(req: Request) {
 
   const [created] = await db
     .insert(teams)
-    .values({ name })
+    .values({
+      name,
+      ownerUserId: auth.user.id,
+      accessCode: generateAccessCode(),
+    })
     .returning({ id: teams.id, name: teams.name, createdAt: teams.createdAt });
 
   return NextResponse.json({ team: created }, { status: 201 });

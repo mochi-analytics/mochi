@@ -1,105 +1,31 @@
 "use client";
 
-import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { inputClass } from "@/components/auth-card";
-
-type ThemePref = "light" | "dark" | "system";
+import { ROLE_BADGE, ROLE_LABEL } from "@/components/admin/roles";
+import { Card, Field, SubmitButton } from "@/components/settings/ui";
+import type { Role } from "@/lib/admin";
 
 /**
- * Three stacked cards for the /settings page: username, password, theme.
- * The username/password cards talk to PATCH /api/user/settings; the theme
- * card is purely client-side and mirrors the pre-hydration script in the
- * root layout (localStorage `theme` + `html.dark`).
+ * Profile page: username, read-only role, and password change. The username
+ * and password cards talk to PATCH /api/user/settings.
  */
-export function UserSettingsForm({ username }: { username: string }) {
+export function ProfileForm({
+  username,
+  role,
+}: {
+  username: string;
+  role: Role;
+}) {
   return (
     <div className="space-y-6">
       <UsernameCard currentUsername={username} />
+      <RoleCard role={role} />
       <PasswordCard />
-      <ThemeCard />
     </div>
   );
 }
-
-/* --------------------------------- shared --------------------------------- */
-
-function Card({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-      <h2 className="text-sm font-semibold">{title}</h2>
-      <p className="mt-1 mb-4 text-sm text-zinc-500 dark:text-zinc-400">
-        {description}
-      </p>
-      {children}
-    </section>
-  );
-}
-
-function Field({
-  label,
-  htmlFor,
-  children,
-}: {
-  label: string;
-  htmlFor: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label
-        htmlFor={htmlFor}
-        className="block text-xs font-medium text-zinc-600 dark:text-zinc-400"
-      >
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-function SubmitButton({
-  busy,
-  saved,
-  disabled = false,
-  idleLabel,
-  busyLabel,
-}: {
-  busy: boolean;
-  saved: boolean;
-  disabled?: boolean;
-  idleLabel: string;
-  busyLabel: string;
-}) {
-  return (
-    <button
-      type="submit"
-      disabled={busy || disabled}
-      className="inline-flex items-center gap-1 rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-    >
-      {busy ? (
-        busyLabel
-      ) : saved ? (
-        <>
-          Saved <Check className="h-3.5 w-3.5" aria-hidden />
-        </>
-      ) : (
-        idleLabel
-      )}
-    </button>
-  );
-}
-
-/* -------------------------------- username -------------------------------- */
 
 function UsernameCard({ currentUsername }: { currentUsername: string }) {
   const router = useRouter();
@@ -170,7 +96,20 @@ function UsernameCard({ currentUsername }: { currentUsername: string }) {
   );
 }
 
-/* -------------------------------- password -------------------------------- */
+function RoleCard({ role }: { role: Role }) {
+  return (
+    <Card
+      title="Role"
+      description="Your access level. Only an admin can change this."
+    >
+      <span
+        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${ROLE_BADGE[role]}`}
+      >
+        {ROLE_LABEL[role]}
+      </span>
+    </Card>
+  );
+}
 
 function PasswordCard() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -270,69 +209,6 @@ function PasswordCard() {
           )}
         </div>
       </form>
-    </Card>
-  );
-}
-
-/* ---------------------------------- theme --------------------------------- */
-
-function ThemeCard() {
-  // Start with a stable value so SSR + first client render match; the actual
-  // stored preference is read in the effect below to avoid hydration warnings.
-  const [theme, setTheme] = useState<ThemePref>("system");
-
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    if (stored === "light" || stored === "dark") setTheme(stored);
-    else setTheme("system");
-  }, []);
-
-  // While "system" is selected, follow live OS changes.
-  useEffect(() => {
-    if (theme !== "system") return;
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const apply = () => {
-      document.documentElement.classList.toggle("dark", mq.matches);
-    };
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
-  }, [theme]);
-
-  function choose(next: ThemePref) {
-    setTheme(next);
-    const root = document.documentElement;
-    if (next === "light") {
-      localStorage.setItem("theme", "light");
-      root.classList.remove("dark");
-    } else if (next === "dark") {
-      localStorage.setItem("theme", "dark");
-      root.classList.add("dark");
-    } else {
-      localStorage.removeItem("theme");
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-      root.classList.toggle("dark", prefersDark);
-    }
-  }
-
-  return (
-    <Card
-      title="Theme"
-      description="Choose how Mochi looks. System follows your operating system."
-    >
-      <Field label="Appearance" htmlFor="settings-theme">
-        <select
-          id="settings-theme"
-          className={`${inputClass} max-w-xs`}
-          value={theme}
-          onChange={(e) => choose(e.target.value as ThemePref)}
-        >
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-          <option value="system">System</option>
-        </select>
-      </Field>
     </Card>
   );
 }

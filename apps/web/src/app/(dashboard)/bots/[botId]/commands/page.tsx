@@ -1,5 +1,6 @@
 import { viz } from "@/components/charts/theme";
 import { RangePicker } from "@/components/range-picker";
+import { getCurrentUser } from "@/lib/auth/session";
 import { formatMs, formatNumber, formatPercent } from "@/lib/format";
 import { getTopCommands, parseRange } from "@/lib/queries";
 
@@ -13,7 +14,8 @@ export default async function CommandsPage({
   searchParams: Promise<{ range?: string }>;
 }) {
   const { botId } = await params;
-  const range = parseRange((await searchParams).range);
+  const user = await getCurrentUser();
+  const range = parseRange((await searchParams).range, user?.defaultRange);
   const commands = await getTopCommands(botId, range);
   const maxUses = commands[0]?.uses ?? 0;
 

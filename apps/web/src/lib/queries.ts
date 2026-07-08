@@ -21,8 +21,11 @@ export const RANGES: Record<
   "90d": { hours: 2160, bucket: "day", label: "Last 90 days" },
 };
 
-export function parseRange(value: string | undefined): Range {
-  return value && value in RANGES ? (value as Range) : "30d";
+export function parseRange(
+  value: string | undefined,
+  fallback: Range = "30d",
+): Range {
+  return value && value in RANGES ? (value as Range) : fallback;
 }
 
 const BUCKET_FN = { hour: "toStartOfHour", day: "toStartOfDay", minute: "toStartOfMinute" } as const;
