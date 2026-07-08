@@ -12,6 +12,9 @@ RUN pnpm --filter @mochi/web build
 
 FROM node:24-alpine AS runner
 ENV NODE_ENV=production
+# Docker injects HOSTNAME=<container-id>; Next standalone would bind to that
+# interface only, breaking the loopback healthcheck below.
+ENV HOSTNAME=0.0.0.0
 ENV MIGRATE_ON_START=1
 ENV RETENTION_CLEANUP=1
 WORKDIR /app
