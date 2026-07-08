@@ -1,0 +1,71 @@
+name: Bug report
+description: Report a reproducible problem with Mochi.
+title: "bug: "
+labels: ["type: bug", "status: needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Mochi. Please include enough detail for someone else to reproduce the issue.
+  - type: textarea
+    id: current
+    attributes:
+      label: What happened?
+      description: Describe the broken behavior and what you expected instead.
+      placeholder: The dashboard shows ..., but I expected ...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: List the smallest set of steps that triggers the issue.
+      placeholder: |
+        1. Start Mochi with ...
+        2. Send an ingest request to ...
+        3. Open ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Dashboard
+        - Ingest API
+        - Database or migrations
+        - Docker or self-hosting
+        - Documentation
+        - CI or release
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include versions and deployment details that may matter.
+      value: |
+        - Mochi version or commit:
+        - Node:
+        - pnpm:
+        - Docker:
+        - Browser:
+        - OS:
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Paste relevant logs, stack traces, request IDs, screenshots, or recordings.
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Anything else that may help diagnose the issue.
+    validations:
+      required: false

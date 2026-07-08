@@ -1,0 +1,27 @@
+name: Documentation
+description: Report missing, confusing, or incorrect documentation.
+title: "docs: "
+labels: ["type: docs", "status: needs triage"]
+body:
+  - type: textarea
+    id: page
+    attributes:
+      label: Page or section
+      description: Link the doc page or name the missing section.
+      placeholder: docs/self-hosting.md, docs/ingest-api.md, README.md, ...
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What should change?
+      description: Explain what is wrong, missing, outdated, or unclear.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested wording or structure
+      description: Optional draft text, examples, or links to helpful references.
+    validations:
+      required: false
