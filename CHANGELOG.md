@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/mochi-analytics/mochi/compare/mochi-v0.2.4...mochi-v0.3.0) (2026-07-08)
+
+
+### Features
+
+* **web:** sidebar nav, user-owned teams, and settings subroutes ([b282abf](https://github.com/mochi-analytics/mochi/commit/b282abf887dff9b4dd7a352f6e595929404bb3c2))
+
+
+### Bug Fixes
+
+* update port mapping for mochi service in docker-compose ([9381496](https://github.com/mochi-analytics/mochi/commit/9381496acd76e187e927f7b5e49eeca62dcb7381))
+
 ## [0.2.4](https://github.com/mochi-analytics/mochi/compare/mochi-v0.2.3...mochi-v0.2.4) (2026-07-08)
 
 
