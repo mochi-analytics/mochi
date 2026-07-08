@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.4](https://github.com/mochi-analytics/mochi/compare/mochi-v0.2.3...mochi-v0.2.4) (2026-07-08)
+
+
+### Bug Fixes
+
+* add Mochi service health check ([b83dd37](https://github.com/mochi-analytics/mochi/commit/b83dd3703e056e49b85d8805c2d80f7af6c95e23))
+
 ## [0.2.3](https://github.com/mochi-analytics/mochi/compare/mochi-v0.2.2...mochi-v0.2.3) (2026-07-08)
 
 
