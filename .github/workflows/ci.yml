@@ -17,4 +17,5 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @mochi/web typecheck
+      - run: pnpm --filter @mochi/web test
       - run: pnpm --filter @mochi/web build

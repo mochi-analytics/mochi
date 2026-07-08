@@ -8,6 +8,8 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck",
     "db:up": "docker compose -f docker/docker-compose.dev.yml up -d",
     "db:down": "docker compose -f docker/docker-compose.dev.yml down"
   },
