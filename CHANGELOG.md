@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/mochi-analytics/mochi/compare/mochi-v0.3.1...mochi-v0.3.2) (2026-07-08)
+
+
+### Bug Fixes
+
+* **styles:** improve select option colors for better readability in light and dark themes ([0e27c52](https://github.com/mochi-analytics/mochi/commit/0e27c528f08b25eecda3322fd67c3da1ba815c50))
+
 ## [0.3.1](https://github.com/mochi-analytics/mochi/compare/mochi-v0.3.0...mochi-v0.3.1) (2026-07-08)
 
 
