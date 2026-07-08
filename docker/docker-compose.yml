@@ -6,7 +6,7 @@ name: mochi
 
 services:
   mochi:
-    image: ghcr.io/mochi-analytics/mochi:${MOCHI_IMAGE_TAG:-latest}
+    image: ghcr.io/mochi-analytics/mochi:latest
     environment:
       DATABASE_URL: postgres://mochi:${POSTGRES_PASSWORD:-change-me}@postgres:5432/mochi
       CLICKHOUSE_URL: http://clickhouse:8123
