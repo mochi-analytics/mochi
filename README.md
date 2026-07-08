@@ -57,8 +57,11 @@ pnpm --filter @mochi/web seed         # optional: 30 days of demo data
 
 ## Releases
 
-The publish workflow builds and publishes the web Docker image to GitHub
-Container Registry:
+Release Please opens and updates a release PR from conventional commits merged
+to `main`. Merging that PR creates the GitHub release and tag.
+
+The publish workflow then builds and publishes the web Docker image to GitHub
+Container Registry from the published release:
 
 ```text
 ghcr.io/<owner>/<repo>
