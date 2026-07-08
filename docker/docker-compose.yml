@@ -6,9 +6,7 @@ name: mochi
 
 services:
   mochi:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+    image: ghcr.io/mochi-analytics/mochi:${MOCHI_IMAGE_TAG:-latest}
     environment:
       DATABASE_URL: postgres://mochi:${POSTGRES_PASSWORD:-change-me}@postgres:5432/mochi
       CLICKHOUSE_URL: http://clickhouse:8123

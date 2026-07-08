@@ -19,7 +19,7 @@ See [docs/self-hosting.md](./docs/self-hosting.md).
 
 ```sh
 POSTGRES_PASSWORD=... CLICKHOUSE_PASSWORD=... \
-docker compose -f docker/docker-compose.yml up -d --build
+docker compose -f docker/docker-compose.yml up -d
 ```
 
 Docker image:
