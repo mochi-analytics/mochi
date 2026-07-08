@@ -1,0 +1,11 @@
+node_modules
+**/node_modules
+**/.next
+**/.turbo
+**/dist
+.git
+docker
+docs
+memory
+*.md
+apps/web/.env

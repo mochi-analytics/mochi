@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1783491210781,
+      "tag": "0000_friendly_hiroim",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783493064407,
+      "tag": "0001_swift_mephisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783499442904,
+      "tag": "0002_charming_mongu",
+      "breakpoints": true
+    }
+  ]
+}

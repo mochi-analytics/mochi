@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Chart color roles from the validated reference palette (dataviz skill).
+ * Dark steps are selected for the dark surface, not an automatic flip.
+ * Light: CVD worst adjacent ΔE 21.2. Dark: ΔE 9.7 (floor band — legal with
+ * the legend + bar gaps + tooltips the charts already ship).
+ */
+:root {
+  color-scheme: light;
+  --viz-commands: #2a78d6;
+  --viz-joins: #1baf7a;
+  --viz-leaves: #e34948;
+  --viz-grid: #e1e0d9;
+  --viz-axis: #c3c2b7;
+  --viz-muted: #898781;
+  --viz-ink-primary: #0b0b0b;
+  --viz-ink-secondary: #52514e;
+  --viz-surface: #fcfcfb;
+  --viz-delta-good: #006300;
+  --viz-delta-bad: #a02222;
+  --viz-border: rgba(11, 11, 11, 0.1);
+  --viz-cursor: rgba(11, 11, 11, 0.04);
+  --badge-join-bg: #e3f4ec;
+  --badge-join-fg: #116a4c;
+  --badge-leave-bg: #fbe9e9;
+  --badge-leave-fg: #8f2d2d;
+}
+
+.dark {
+  color-scheme: dark;
+  --viz-commands: #3987e5;
+  --viz-joins: #199e70;
+  --viz-leaves: #e66767;
+  --viz-grid: #2c2c2a;
+  --viz-axis: #383835;
+  --viz-muted: #898781;
+  --viz-ink-primary: #ffffff;
+  --viz-ink-secondary: #c3c2b7;
+  --viz-surface: #1a1a19;
+  --viz-delta-good: #0ca30c;
+  --viz-delta-bad: #d03b3b;
+  --viz-border: rgba(255, 255, 255, 0.1);
+  --viz-cursor: rgba(255, 255, 255, 0.06);
+  --badge-join-bg: #12352a;
+  --badge-join-fg: #4ecf9a;
+  --badge-leave-bg: #3a1d1d;
+  --badge-leave-fg: #ef8a8a;
+}
