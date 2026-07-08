@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/mochi-analytics/mochi/compare/mochi-v0.3.0...mochi-v0.3.1) (2026-07-08)
+
+
+### Bug Fixes
+
+* **docker:** bind Next to 0.0.0.0 so the container healthcheck passes ([55826c7](https://github.com/mochi-analytics/mochi/commit/55826c78033e375e4fdaf05b9a51e0000bb7694e))
+
 ## [0.3.0](https://github.com/mochi-analytics/mochi/compare/mochi-v0.2.4...mochi-v0.3.0) (2026-07-08)
 
 
