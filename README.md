@@ -3,6 +3,8 @@
 Self-hosted analytics for Discord bots: command usage, server growth, and bot
 health in one dashboard.
 
+Full documentation: **[docs.mochis.dev](https://docs.mochis.dev)**
+
 ## Features
 
 - Privacy-friendly analytics with salted user-id hashing
@@ -15,7 +17,7 @@ health in one dashboard.
 
 ## Self-Hosting
 
-See [docs/self-hosting.md](./docs/self-hosting.md).
+See the [self-hosting guide](https://docs.mochis.dev/self-hosting).
 
 ```sh
 POSTGRES_PASSWORD=... CLICKHOUSE_PASSWORD=... \
@@ -30,9 +32,11 @@ ghcr.io/mochi-analytics/mochi
 
 ## Instrumentation
 
-Discord.js SDK setup: [docs/sdk-discordjs.md](./docs/sdk-discordjs.md)
+- [discord.js SDK](https://docs.mochis.dev/sdks/discordjs)
+- [discord.py SDK](https://docs.mochis.dev/sdks/discordpy)
+- [Raw ingest API](https://docs.mochis.dev/ingest-api) - for any other language
 
-Raw ingest API: [docs/ingest-api.md](./docs/ingest-api.md)
+All SDKs: [docs.mochis.dev/sdks](https://docs.mochis.dev/sdks)
 
 ## Development
 
@@ -56,7 +60,6 @@ pnpm --filter @mochi/web seed
 
 - `apps/web` - Next.js dashboard, management API, ingest API
 - `docker/` - Dockerfile and Docker Compose files
-- `docs/` - self-hosting, SDK, and ingest API docs
 
 ## License
 
