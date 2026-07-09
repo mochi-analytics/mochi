@@ -3,7 +3,7 @@ import { eq, inArray, or } from "drizzle-orm";
 import type { Role } from "@/lib/admin";
 import type { SessionUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
-import { teamMembers, teams, users } from "@/lib/db/schema";
+import { teamBots, teamMembers, teams, users } from "@/lib/db/schema";
 
 /** Shared user-facing team domain: any user can create/own/join teams. */
 
@@ -87,6 +87,18 @@ export async function listTeamsForUser(user: SessionUser): Promise<UserTeam[]> {
     createdAt: t.createdAt,
     members: members.get(t.id) ?? [],
   }));
+}
+
+/** Teams a bot is currently shared with, alphabetical. */
+export async function listTeamsForBot(
+  botId: string,
+): Promise<{ id: string; name: string }[]> {
+  return db
+    .select({ id: teams.id, name: teams.name })
+    .from(teamBots)
+    .innerJoin(teams, eq(teams.id, teamBots.teamId))
+    .where(eq(teamBots.botId, botId))
+    .orderBy(teams.name);
 }
 
 /** A single team the user can access (owner or member), else null. */

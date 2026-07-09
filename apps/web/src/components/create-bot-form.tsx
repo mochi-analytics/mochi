@@ -4,10 +4,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { inputClass } from "@/components/auth-card";
 
-export function CreateBotForm() {
+export type TeamOption = { id: string; name: string };
+
+export function CreateBotForm({ teams }: { teams: TeamOption[] }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [appId, setAppId] = useState("");
+  const [teamId, setTeamId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -21,6 +24,7 @@ export function CreateBotForm() {
       body: JSON.stringify({
         name,
         discordApplicationId: appId || undefined,
+        teamId: teamId || undefined,
       }),
     });
     if (res.ok) {
@@ -51,6 +55,21 @@ export function CreateBotForm() {
         onChange={(e) => setAppId(e.target.value)}
         pattern="\d{1,20}"
       />
+      {teams.length > 0 && (
+        <select
+          className={inputClass}
+          value={teamId}
+          onChange={(e) => setTeamId(e.target.value)}
+          aria-label="Share with a team"
+        >
+          <option value="">No team (just me)</option>
+          {teams.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
+            </option>
+          ))}
+        </select>
+      )}
       <button
         className="shrink-0 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
         disabled={busy}

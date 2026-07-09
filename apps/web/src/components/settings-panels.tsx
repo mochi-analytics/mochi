@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { inputClass } from "@/components/auth-card";
@@ -53,6 +53,120 @@ export function SharePanel({
         >
           Enable public share link
         </button>
+      )}
+    </div>
+  );
+}
+
+type TeamOption = { id: string; name: string };
+
+export function TeamSharePanel({
+  botId,
+  sharedTeams,
+  myTeams,
+}: {
+  botId: string;
+  sharedTeams: TeamOption[];
+  myTeams: TeamOption[];
+}) {
+  const router = useRouter();
+  const [teamId, setTeamId] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const sharedIds = new Set(sharedTeams.map((t) => t.id));
+  const addableTeams = myTeams.filter((t) => !sharedIds.has(t.id));
+
+  async function call(url: string, method: string, body?: unknown) {
+    setBusy(true);
+    setError(null);
+    const res = await fetch(url, {
+      method,
+      headers: body ? { "Content-Type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    setBusy(false);
+    if (res.ok) {
+      router.refresh();
+      return true;
+    }
+    const data = await res.json().catch(() => null);
+    setError(data?.error ?? "Something went wrong");
+    return false;
+  }
+
+  async function share() {
+    if (!teamId) return;
+    if (await call(`/api/bots/${botId}/teams`, "POST", { teamId }))
+      setTeamId("");
+  }
+  async function unshare(id: string) {
+    await call(`/api/bots/${botId}/teams/${id}`, "DELETE");
+  }
+
+  return (
+    <div className="space-y-3">
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+
+      {sharedTeams.length === 0 ? (
+        <p className="rounded-md border border-dashed border-zinc-200 px-3 py-4 text-center text-sm text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
+          Not shared with any team yet.
+        </p>
+      ) : (
+        <ul className="space-y-1.5">
+          {sharedTeams.map((t) => (
+            <li
+              key={t.id}
+              className="group flex items-center justify-between gap-2 rounded-md bg-zinc-50 px-2.5 py-1.5 dark:bg-zinc-800/50"
+            >
+              <span className="truncate text-sm">{t.name}</span>
+              <button
+                onClick={() => unshare(t.id)}
+                disabled={busy}
+                aria-label={`Unshare from ${t.name}`}
+                title={`Unshare from ${t.name}`}
+                className="inline-flex shrink-0 items-center justify-center rounded p-1 text-zinc-400 transition hover:bg-zinc-200 hover:text-red-600 focus:opacity-100 disabled:opacity-40 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 dark:text-zinc-500 dark:hover:bg-zinc-700 dark:hover:text-red-400"
+              >
+                <X className="h-3.5 w-3.5" aria-hidden />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {myTeams.length === 0 ? (
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          You aren't in any teams yet — create or join one on the Teams page.
+        </p>
+      ) : (
+        <div className="flex gap-2">
+          <select
+            className={`${inputClass} min-w-0 flex-1 py-1.5 text-sm`}
+            value={teamId}
+            onChange={(e) => setTeamId(e.target.value)}
+            disabled={addableTeams.length === 0 || busy}
+            aria-label="Share with a team"
+          >
+            <option value="">
+              {addableTeams.length === 0
+                ? "Shared with all your teams"
+                : "Share with a team…"}
+            </option>
+            {addableTeams.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={share}
+            disabled={!teamId || busy}
+            className="inline-flex shrink-0 items-center gap-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          >
+            <Plus className="h-3.5 w-3.5" aria-hidden />
+            Share
+          </button>
+        </div>
       )}
     </div>
   );

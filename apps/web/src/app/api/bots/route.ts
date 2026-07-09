@@ -4,7 +4,8 @@ import { z } from "zod";
 import { jsonError, parseBody, requireUser } from "@/lib/api";
 import { listAccessibleBots } from "@/lib/auth/access";
 import { db } from "@/lib/db";
-import { bots, botSettings } from "@/lib/db/schema";
+import { bots, botSettings, teamBots } from "@/lib/db/schema";
+import { getTeamForUser } from "@/lib/teams";
 
 export async function GET() {
   const auth = await requireUser();
@@ -20,6 +21,7 @@ const createSchema = z.object({
     .string()
     .regex(/^\d{1,20}$/, "must be a Discord application id")
     .optional(),
+  teamId: z.string().uuid().optional(),
 });
 
 export async function POST(req: Request) {
@@ -34,6 +36,12 @@ export async function POST(req: Request) {
   const parsed = await parseBody(req, createSchema);
   if ("response" in parsed) return parsed.response;
 
+  // You can only place a new bot in a team you own or belong to.
+  const { teamId } = parsed.data;
+  if (teamId && !(await getTeamForUser(teamId, auth.user))) {
+    return jsonError(404, "Team not found");
+  }
+
   const bot = await db.transaction(async (tx) => {
     const [created] = await tx
       .insert(bots)
@@ -47,6 +55,9 @@ export async function POST(req: Request) {
       botId: created.id,
       userHashSalt: randomBytes(16).toString("hex"),
     });
+    if (teamId) {
+      await tx.insert(teamBots).values({ teamId, botId: created.id });
+    }
     return created;
   });
 
