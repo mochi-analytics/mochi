@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -9 120 120">
+  <title>Mochi</title>
+  <!--
+    Standalone copy of the MochiLogo mascot for the browser tab. It can't read
+    the app's theme, so it follows the OS scheme instead. Keep the palette in
+    sync with the mochi custom properties in globals.css.
+
+    Careful: a favicon is decoded as an image, so this file must be well-formed
+    XML. A double hyphen here (writing the property prefix literally, say) makes
+    the whole document unparseable and the icon silently falls back to default.
+  -->
+  <style>
+    :root {
+      --mochi-body-0: #ffe8f2;
+      --mochi-body-1: #ffd3e7;
+      --mochi-body-2: #ffbcd8;
+      --mochi-outline: #c77a99;
+      --mochi-cheek: #ff9ec4;
+      --mochi-eye: #5a2b40;
+      --mochi-mouth: #a83a58;
+      --mochi-tongue: #ff8fa8;
+      --mochi-glint: #ffffff;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --mochi-body-0: #ffdcec;
+        --mochi-body-1: #ffbfda;
+        --mochi-body-2: #f9a3c6;
+        --mochi-outline: #b06b88;
+        --mochi-cheek: #f4739f;
+      }
+    }
+  </style>
+  <defs>
+    <radialGradient id="bodyGrad" cx="42.105301" cy="21.941532" r="73.324878" fx="42.105301" fy="21.941532" gradientTransform="matrix(1.1150377,0,0,0.49962579,0,14.578445)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="var(--mochi-body-0)" />
+      <stop offset="0.78064793" stop-color="var(--mochi-body-1)" />
+      <stop offset="1" stop-color="var(--mochi-body-2)" />
+    </radialGradient>
+    <clipPath id="mouthClip">
+      <path d="M51 62 C53 71,67 71,69 62 C63 66,57 66,51 62 Z" />
+    </clipPath>
+  </defs>
+
+  <path d="m 10,48 c 0,-21 20,-37 50,-37 30,0 50,16 50,37 0,12 -3,22 -13,31 C 85,89 72,91 60,91 48,91 35,89 23,79 13,70 10,60 10,48 Z" fill="url(#bodyGrad)" stroke="var(--mochi-outline)" stroke-width="2.2" stroke-linejoin="round" />
+
+  <ellipse cx="31" cy="60" rx="9" ry="5" fill="var(--mochi-cheek)" />
+  <ellipse cx="89" cy="60" rx="9" ry="5" fill="var(--mochi-cheek)" />
+
+  <ellipse cx="45" cy="48.5" rx="6.6" ry="8" fill="var(--mochi-eye)" />
+  <ellipse cx="75" cy="48.5" rx="6.6" ry="8" fill="var(--mochi-eye)" />
+  <circle cx="47.6" cy="45" r="2.7" fill="var(--mochi-glint)" />
+  <circle cx="77.6" cy="45" r="2.7" fill="var(--mochi-glint)" />
+  <circle cx="43" cy="52" r="1.4" fill="var(--mochi-glint)" opacity="0.85" />
+  <circle cx="73" cy="52" r="1.4" fill="var(--mochi-glint)" opacity="0.85" />
+
+  <path d="M51 62 C53 71,67 71,69 62 C63 66,57 66,51 62 Z" fill="var(--mochi-mouth)" />
+  <g clip-path="url(#mouthClip)">
+    <ellipse cx="60" cy="70" rx="6" ry="3.6" fill="var(--mochi-tongue)" />
+  </g>
+  <path d="M51 62 C53 71,67 71,69 62 C63 66,57 66,51 62 Z" fill="none" stroke="var(--mochi-mouth)" stroke-width="1.4" stroke-linejoin="round" />
+</svg>

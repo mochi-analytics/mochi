@@ -29,6 +29,15 @@
   --badge-join-fg: #116a4c;
   --badge-leave-bg: #fbe9e9;
   --badge-leave-fg: #8f2d2d;
+  --mochi-body-0: #ffe8f2;
+  --mochi-body-1: #ffd3e7;
+  --mochi-body-2: #ffbcd8;
+  --mochi-outline: #c77a99;
+  --mochi-cheek: #ff9ec4;
+  --mochi-eye: #5a2b40;
+  --mochi-mouth: #a83a58;
+  --mochi-tongue: #ff8fa8;
+  --mochi-glint: #ffffff;
 }
 
 /*
@@ -66,4 +75,14 @@ select option {
   --badge-join-fg: #4ecf9a;
   --badge-leave-bg: #3a1d1d;
   --badge-leave-fg: #ef8a8a;
+  /*
+   * Mochi runs a touch deeper on the dark surface so the body doesn't glare
+   * against zinc-950, which in turn needs deeper cheeks to stay legible.
+   * The face colors already sit on the body, not the page, so they carry over.
+   */
+  --mochi-body-0: #ffdcec;
+  --mochi-body-1: #ffbfda;
+  --mochi-body-2: #f9a3c6;
+  --mochi-outline: #b06b88;
+  --mochi-cheek: #f4739f;
 }

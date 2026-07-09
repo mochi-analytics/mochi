@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="icon.png" alt="" width="96" height="96">
+</p>
+
 # Mochi
 
 Self-hosted analytics for Discord bots: command usage, server growth, and bot
@@ -38,6 +42,7 @@ ghcr.io/mochi-analytics/mochi
 
 - [discord.js SDK](https://docs.mochis.dev/sdks/discordjs)
 - [discord.py SDK](https://docs.mochis.dev/sdks/discordpy)
+- [discordgo SDK](https://docs.mochis.dev/sdks/go)
 - [Raw ingest API](https://docs.mochis.dev/ingest-api) - for any other language
 
 All SDKs: [docs.mochis.dev/sdks](https://docs.mochis.dev/sdks)
@@ -64,6 +69,26 @@ pnpm --filter @mochi/web seed
 
 - `apps/web` - Next.js dashboard, management API, ingest API
 - `docker/` - Dockerfile and Docker Compose files
+
+## Help wanted: a better logo
+
+The mascot above was drawn by a developer, not a designer, and it shows. It is
+a placeholder, and we would love for someone to replace it.
+
+If you would like to take a pass at it, open an issue or a PR. Roughly what
+we're after:
+
+- Reads clearly at 16x16 (favicon) as well as at full size
+- Works on both light and dark backgrounds
+- An SVG source, ideally one that themes through CSS custom properties the way
+  [`apps/web/src/app/icon.svg`](apps/web/src/app/icon.svg) does
+- Keeps the general spirit: a soft, round, friendly rice cake
+
+The current icon lives at `apps/web/src/app/icon.svg`. The PNGs at the repo root
+are rasterized from it by `apps/web/scripts/export-icon.mjs`.
+
+Contributions are credited, and by opening a PR you agree to license the artwork
+to the project under the same terms as the rest of the branding.
 
 ## License
 

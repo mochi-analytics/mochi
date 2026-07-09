@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
-import { Cookie } from "lucide-react";
 import { notFound } from "next/navigation";
 import { z } from "zod";
+import { MochiLogo } from "@/components/mochi-logo";
 import { OverviewDashboard } from "@/components/overview-dashboard";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { db } from "@/lib/db";
@@ -39,7 +39,7 @@ export default async function SharePage({
           </span>
           <span className="flex items-center gap-3">
             <span className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500">
-              stats by <Cookie className="h-3.5 w-3.5" aria-hidden /> Mochi
+              stats by <MochiLogo className="h-3.5 w-3.5" /> Mochi
             </span>
             <ThemeToggle />
           </span>

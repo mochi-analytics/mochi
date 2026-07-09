@@ -1,19 +1,11 @@
 "use client";
 
-import {
-  Bot,
-  Cookie,
-  Menu,
-  Settings,
-  Shield,
-  User,
-  Users,
-  X,
-} from "lucide-react";
+import { Bot, Menu, Settings, Shield, User, Users, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { LogoutButton } from "@/components/logout-button";
+import { MochiLogo } from "@/components/mochi-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { Role } from "@/lib/admin";
 
@@ -44,7 +36,7 @@ export function DashboardSidebar({
           href="/bots"
           className="flex items-center gap-2 text-lg font-semibold tracking-tight"
         >
-          <Cookie className="h-5 w-5" aria-hidden />
+          <MochiLogo className="h-8 w-8 shrink-0" />
           Mochi
         </Link>
         <button
@@ -77,7 +69,7 @@ export function DashboardSidebar({
             className="flex items-center gap-2 text-lg font-semibold tracking-tight"
             onClick={() => setOpen(false)}
           >
-            <Cookie className="h-5 w-5" aria-hidden />
+            <MochiLogo className="h-8 w-8 shrink-0" />
             Mochi
           </Link>
           <button

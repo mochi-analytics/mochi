@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
-import { Cookie } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
+import { MochiLogo } from "@/components/mochi-logo";
 import { db } from "@/lib/db";
 import { bots } from "@/lib/db/schema";
 import { formatCompact, formatPercent } from "@/lib/format";
@@ -56,7 +56,7 @@ export default async function ShareWidgetPage({
               target="_blank"
               className="flex shrink-0 items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
             >
-              stats by <Cookie className="h-3 w-3" aria-hidden /> Mochi
+              stats by <MochiLogo className="h-3 w-3" /> Mochi
             </Link>
           </div>
           <div className="mt-3 grid grid-cols-4 gap-3">
