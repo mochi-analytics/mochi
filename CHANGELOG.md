@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.0](https://github.com/mochi-analytics/mochi/compare/mochi-v0.3.2...mochi-v0.4.0) (2026-07-09)
+
+
+### Features
+
+* give actual logo ([4eea43b](https://github.com/mochi-analytics/mochi/commit/4eea43beda1cc643affceab5b718fa0edaba3c25))
+* implement team sharing functionality (oops) ([62063c6](https://github.com/mochi-analytics/mochi/commit/62063c6322251df0de6842210c7fdfacc4a40c52))
+* **web:** alerting, errors, health, comparison, badges, exports ([dacbcbf](https://github.com/mochi-analytics/mochi/commit/dacbcbf63b47fe03ce303aff7943bb5df151ffdb))
+
 ## [0.3.2](https://github.com/mochi-analytics/mochi/compare/mochi-v0.3.1...mochi-v0.3.2) (2026-07-08)
 
 
