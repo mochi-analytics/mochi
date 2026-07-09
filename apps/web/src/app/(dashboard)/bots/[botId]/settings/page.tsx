@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
+import { AlertsPanel } from "@/components/alerts-panel";
 import { ApiKeysPanel } from "@/components/api-keys-panel";
 import { DeleteBotButton } from "@/components/delete-bot-button";
 import {
@@ -11,7 +12,7 @@ import {
 import { getAccessibleBot } from "@/lib/auth/access";
 import { getCurrentUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
-import { apiKeys, botSettings } from "@/lib/db/schema";
+import { alertConfigs, apiKeys, botSettings } from "@/lib/db/schema";
 import { listTeamsForBot, listTeamsForUser } from "@/lib/teams";
 
 export const dynamic = "force-dynamic";
@@ -30,7 +31,7 @@ export default async function BotSettingsPage({
   // Viewers have no settings to change; send them back to the dashboard.
   if (!bot.canWrite) redirect(`/bots/${bot.id}`);
 
-  const [keys, [settings], sharedTeams, myTeams] = await Promise.all([
+  const [keys, [settings], [alertConfig], sharedTeams, myTeams] = await Promise.all([
     db
       .select({
         id: apiKeys.id,
@@ -47,6 +48,11 @@ export default async function BotSettingsPage({
       .select()
       .from(botSettings)
       .where(eq(botSettings.botId, bot.id))
+      .limit(1),
+    db
+      .select()
+      .from(alertConfigs)
+      .where(eq(alertConfigs.botId, bot.id))
       .limit(1),
     listTeamsForBot(bot.id),
     listTeamsForUser(user),
@@ -82,6 +88,32 @@ export default async function BotSettingsPage({
           botId={bot.id}
           sharedTeams={sharedTeams}
           myTeams={myTeams.map((t) => ({ id: t.id, name: t.name }))}
+        />
+      </section>
+
+      <section className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm">
+        <h2 className="text-sm font-semibold">Alerts & weekly digest</h2>
+        <p className="mt-1 mb-4 text-sm text-zinc-500 dark:text-zinc-400">
+          Posts to a Discord webhook when the bot goes offline, command errors
+          spike, or the server count drops — plus an optional Monday summary
+          of the past week.
+        </p>
+        <AlertsPanel
+          botId={bot.id}
+          config={
+            alertConfig
+              ? {
+                  webhookUrl: alertConfig.webhookUrl,
+                  offlineEnabled: alertConfig.offlineEnabled,
+                  offlineAfterMinutes: alertConfig.offlineAfterMinutes,
+                  errorSpikeEnabled: alertConfig.errorSpikeEnabled,
+                  errorRatePct: alertConfig.errorRatePct,
+                  guildDropEnabled: alertConfig.guildDropEnabled,
+                  guildDropPct: alertConfig.guildDropPct,
+                  digestEnabled: alertConfig.digestEnabled,
+                }
+              : null
+          }
         />
       </section>
 

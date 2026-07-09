@@ -30,6 +30,9 @@ export function SharePanel({
     setBusy(false);
   }
 
+  const origin =
+    typeof window !== "undefined" ? window.location.origin : "";
+
   return (
     <div className="space-y-3">
       {shareId ? (
@@ -37,6 +40,37 @@ export function SharePanel({
           <code className="block break-all rounded bg-zinc-50 p-2 font-mono text-xs dark:bg-zinc-800">
             {shareUrl ?? `/share/${shareId}`}
           </code>
+
+          <div className="space-y-1.5">
+            <p className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+              README badge{" "}
+              <span className="font-normal text-zinc-400 dark:text-zinc-500">
+                (metric: servers, commands, users, or uptime)
+              </span>
+            </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`/api/badge/${shareId}?metric=servers`}
+              alt="servers badge preview"
+              className="h-5"
+            />
+            <code className="block break-all rounded bg-zinc-50 p-2 font-mono text-xs dark:bg-zinc-800">
+              {`![servers](${origin}/api/badge/${shareId}?metric=servers)`}
+            </code>
+          </div>
+
+          <div className="space-y-1.5">
+            <p className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+              Embeddable widget{" "}
+              <span className="font-normal text-zinc-400 dark:text-zinc-500">
+                (append &amp;theme=dark for dark sites)
+              </span>
+            </p>
+            <code className="block break-all rounded bg-zinc-50 p-2 font-mono text-xs dark:bg-zinc-800">
+              {`<iframe src="${origin}/share/${shareId}/widget?range=30d" width="640" height="130" frameborder="0" title="bot stats"></iframe>`}
+            </code>
+          </div>
+
           <button
             onClick={() => toggle(false)}
             disabled={busy}

@@ -11,7 +11,7 @@ export function StatTile({
 }: {
   label: string;
   value: string;
-  delta?: { value: number; upIsGood: boolean; suffix?: string };
+  delta?: { value: number; upIsGood: boolean; suffix?: string; note?: string };
 }) {
   const deltaColor =
     delta && delta.value !== 0
@@ -28,6 +28,12 @@ export function StatTile({
           {delta.value > 0 ? "+" : ""}
           {delta.value.toLocaleString("en")}
           {delta.suffix ?? ""}
+          {delta.note && (
+            <span className="font-normal" style={{ color: viz.muted }}>
+              {" "}
+              {delta.note}
+            </span>
+          )}
         </div>
       )}
     </div>

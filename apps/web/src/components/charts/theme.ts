@@ -10,6 +10,8 @@ export const viz = {
   commands: "var(--viz-commands)",
   joins: "var(--viz-joins)",
   leaves: "var(--viz-leaves)",
+  errors: "var(--viz-errors)",
+  compare: "var(--viz-compare)",
   grid: "var(--viz-grid)",
   axis: "var(--viz-axis)",
   muted: "var(--viz-muted)",

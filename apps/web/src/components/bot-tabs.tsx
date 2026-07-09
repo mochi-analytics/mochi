@@ -8,6 +8,8 @@ const TABS = [
   { segment: "commands", label: "Commands" },
   { segment: "guilds", label: "Guilds" },
   { segment: "events", label: "Events" },
+  { segment: "errors", label: "Errors" },
+  { segment: "health", label: "Health" },
   { segment: "realtime", label: "Realtime" },
   { segment: "settings", label: "Settings", writeOnly: true },
 ];

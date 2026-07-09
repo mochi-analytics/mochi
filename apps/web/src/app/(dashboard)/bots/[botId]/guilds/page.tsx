@@ -1,3 +1,4 @@
+import { ExportLinks } from "@/components/export-links";
 import { RangePicker } from "@/components/range-picker";
 import { getCurrentUser } from "@/lib/auth/session";
 import { formatNumber, formatRelative } from "@/lib/format";
@@ -22,7 +23,10 @@ export default async function GuildsPage({
 
   return (
     <div className="space-y-6">
-      <RangePicker current={range} />
+      <div className="flex items-center">
+        <RangePicker current={range} />
+        <ExportLinks botId={botId} data="guilds" range={range} />
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm lg:col-span-2">

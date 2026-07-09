@@ -9,10 +9,14 @@ Full documentation: **[docs.mochis.dev](https://docs.mochis.dev)**
 
 - Privacy-friendly analytics with salted user-id hashing
 - Command usage, success rate, latency, and unique-user metrics
-- Guild growth and churn tracking
-- Custom events with metadata
+- Guild growth and churn tracking, with previous-period comparison
+- Custom events with metadata and a per-event meta explorer
+- Error tracking: error events, failing commands, affected users
+- Health dashboard: per-shard status, gateway ping, uptime
+- Discord webhook alerts (offline, error spikes, server drops) and a weekly digest
 - Realtime activity feed
-- Public read-only share links
+- Public read-only share links, README badges, and embeddable widgets
+- CSV/JSON exports and a read-only stats API
 - Per-bot API keys, retention settings, and salt rotation
 
 ## Self-Hosting

@@ -35,6 +35,23 @@ const TOTAL_WEIGHT = COMMANDS.reduce((sum, c) => sum + c.weight, 0);
 
 const CUSTOM_EVENTS = ["premium_purchased", "playlist_created", "level_up"];
 
+const ERROR_EVENTS = [
+  { name: "DiscordAPIError[50013]", weight: 4 },
+  { name: "VoiceConnectionTimeout", weight: 3 },
+  { name: "TrackLoadFailed", weight: 2 },
+  { name: "DatabaseTimeout", weight: 1 },
+];
+const ERROR_WEIGHT = ERROR_EVENTS.reduce((sum, e) => sum + e.weight, 0);
+
+function pickError() {
+  let roll = Math.random() * ERROR_WEIGHT;
+  for (const err of ERROR_EVENTS) {
+    roll -= err.weight;
+    if (roll <= 0) return err;
+  }
+  return ERROR_EVENTS[0];
+}
+
 function pickCommand() {
   let roll = Math.random() * TOTAL_WEIGHT;
   for (const cmd of COMMANDS) {
@@ -116,7 +133,22 @@ async function main() {
       const user = users[Math.floor(Math.random() ** 1.4 * users.length)];
 
       const roll = Math.random();
-      if (roll < 0.97) {
+      if (roll >= 0.99) {
+        // ~1% tracked error events, so the errors dashboard has data.
+        events.push({
+          bot_id: bot.id,
+          event_type: "error",
+          event_name: pickError().name,
+          guild_id: guild.id,
+          channel_type: "guild_text",
+          user_hash: hashUser(user, salt),
+          shard_id: 0,
+          success: 1,
+          duration_ms: 0,
+          metadata: JSON.stringify({ command: pickCommand().name }),
+          created_at: chTs(ts),
+        });
+      } else if (roll < 0.97) {
         const cmd = pickCommand();
         const failed = Math.random() < cmd.errorRate;
         events.push({
@@ -184,8 +216,9 @@ async function main() {
     }
     guildCount += joins - leaves;
 
-    // Hourly snapshots.
+    // Hourly snapshots, with one multi-hour outage so uptime isn't a flat 100%.
     for (let hour = 0; hour < 24; hour++) {
+      if (day === 12 && hour >= 5 && hour <= 7) continue;
       const ts = dayStart + hour * 3_600_000;
       if (ts > now) break;
       snapshots.push({

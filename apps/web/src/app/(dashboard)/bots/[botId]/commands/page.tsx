@@ -1,4 +1,5 @@
 import { viz } from "@/components/charts/theme";
+import { ExportLinks } from "@/components/export-links";
 import { RangePicker } from "@/components/range-picker";
 import { getCurrentUser } from "@/lib/auth/session";
 import { formatMs, formatNumber, formatPercent } from "@/lib/format";
@@ -21,7 +22,10 @@ export default async function CommandsPage({
 
   return (
     <div className="space-y-6">
-      <RangePicker current={range} />
+      <div className="flex items-center">
+        <RangePicker current={range} />
+        <ExportLinks botId={botId} data="commands" range={range} />
+      </div>
 
       <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
         <table className="w-full text-sm">
