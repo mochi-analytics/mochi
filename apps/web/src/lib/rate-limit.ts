@@ -1,75 +1,79 @@
+import { and, asc, eq, gt, lte, sql } from "drizzle-orm";
 import { jsonError } from "@/lib/api";
+import { db } from "@/lib/db";
+import { rateLimitAttempts } from "@/lib/db/schema";
 
-/**
- * Sliding-window rate limiter, in memory. Per-process state is enough for
- * the single-container cloud deployment; if Mochi ever runs replicated,
- * swap the store for Postgres/Redis behind the same check.
- */
-
-type Rule = { limit: number; windowMs: number };
-
-/** Attempt timestamps per key, oldest first. */
-const attempts = new Map<string, number[]>();
-
-// Beyond this many tracked keys, expired entries are swept on the next
-// check so an attacker rotating keys can't grow the map without bound.
-const SWEEP_THRESHOLD = 10_000;
+export type RateLimitRule = { limit: number; windowMs: number };
 
 export type RateLimitResult =
   | { ok: true }
   | { ok: false; retryAfterSeconds: number };
 
-export function checkRateLimit(
-  key: string,
-  rule: Rule,
-  now: number = Date.now(),
-): RateLimitResult {
-  const cutoff = now - rule.windowMs;
-
-  if (attempts.size > SWEEP_THRESHOLD) {
-    for (const [k, times] of attempts) {
-      if (times[times.length - 1] < cutoff) attempts.delete(k);
-    }
-  }
-
-  const recent = (attempts.get(key) ?? []).filter((t) => t >= cutoff);
-  if (recent.length >= rule.limit) {
-    attempts.set(key, recent);
-    return {
-      ok: false,
-      retryAfterSeconds: Math.max(
-        1,
-        Math.ceil((recent[0] + rule.windowMs - now) / 1000),
-      ),
-    };
-  }
-
-  recent.push(now);
-  attempts.set(key, recent);
-  return { ok: true };
-}
-
-/** Test hook. */
-export function resetRateLimits(): void {
-  attempts.clear();
-}
-
 /**
- * Best-effort client IP. Cloud runs behind a reverse proxy, so the first
- * x-forwarded-for hop is the client; direct connections have no header.
+ * Durable sliding-window limiter. The advisory lock serializes checks for the
+ * same key, so parallel requests cannot all observe a free final slot.
  */
+export async function checkRateLimit(
+  key: string,
+  rule: RateLimitRule,
+  now: Date = new Date(),
+): Promise<RateLimitResult> {
+  return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtextextended(${key}, 0))`,
+    );
+
+    // Expiry is stored per event, so this cleanup is safe across rules that
+    // use different window lengths.
+    await tx
+      .delete(rateLimitAttempts)
+      .where(lte(rateLimitAttempts.expiresAt, now));
+
+    const recent = await tx
+      .select({ expiresAt: rateLimitAttempts.expiresAt })
+      .from(rateLimitAttempts)
+      .where(
+        and(
+          eq(rateLimitAttempts.key, key),
+          gt(rateLimitAttempts.expiresAt, now),
+        ),
+      )
+      .orderBy(asc(rateLimitAttempts.expiresAt))
+      .limit(rule.limit);
+
+    if (recent.length >= rule.limit) {
+      return {
+        ok: false,
+        retryAfterSeconds: Math.max(
+          1,
+          Math.ceil((recent[0].expiresAt.getTime() - now.getTime()) / 1000),
+        ),
+      };
+    }
+
+    await tx.insert(rateLimitAttempts).values({
+      key,
+      expiresAt: new Date(now.getTime() + rule.windowMs),
+      createdAt: now,
+    });
+    return { ok: true };
+  });
+}
+
+/** Best-effort client IP from the reverse proxy headers. */
 export function clientIp(req: Request): string {
   const fwd = req.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim();
   return req.headers.get("x-real-ip") ?? "unknown";
 }
 
-/**
- * Applies a rule keyed on route + client IP. Returns a ready-to-return 429
- * when over the limit, or null to proceed.
- */
-export function rateLimitResponse(req: Request, route: string, rule: Rule) {
-  const result = checkRateLimit(`${route}:${clientIp(req)}`, rule);
+/** Applies a rule keyed on route + client IP. */
+export async function rateLimitResponse(
+  req: Request,
+  route: string,
+  rule: RateLimitRule,
+) {
+  const result = await checkRateLimit(`${route}:${clientIp(req)}`, rule);
   if (result.ok) return null;
   const res = jsonError(429, "Too many attempts — try again later");
   res.headers.set("Retry-After", String(result.retryAfterSeconds));

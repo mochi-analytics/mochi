@@ -1,39 +1,68 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { checkRateLimit, clientIp, resetRateLimits } from "@/lib/rate-limit";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const { dbMock, tx, selectRows, insertValues } = vi.hoisted(() => {
+  const selectRows: { expiresAt: Date }[] = [];
+  const insertValues = vi.fn().mockResolvedValue(undefined);
+  const tx = {
+    execute: vi.fn().mockResolvedValue(undefined),
+    delete: vi.fn(() => ({ where: vi.fn().mockResolvedValue(undefined) })),
+    select: vi.fn(() => ({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          orderBy: vi.fn(() => ({
+            limit: vi.fn(() => Promise.resolve([...selectRows])),
+          })),
+        })),
+      })),
+    })),
+    insert: vi.fn(() => ({ values: insertValues })),
+  };
+  const dbMock = {
+    transaction: vi.fn(async (callback: (value: typeof tx) => unknown) =>
+      callback(tx),
+    ),
+  };
+  return { dbMock, tx, selectRows, insertValues };
+});
+
+vi.mock("@/lib/db", () => ({ db: dbMock }));
+
+import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 
 const RULE = { limit: 3, windowMs: 60_000 };
 
 describe("checkRateLimit", () => {
-  beforeEach(() => resetRateLimits());
-
-  it("allows up to the limit, then blocks with a retry hint", () => {
-    const t0 = 1_000_000;
-    expect(checkRateLimit("k", RULE, t0)).toEqual({ ok: true });
-    expect(checkRateLimit("k", RULE, t0 + 1)).toEqual({ ok: true });
-    expect(checkRateLimit("k", RULE, t0 + 2)).toEqual({ ok: true });
-
-    const blocked = checkRateLimit("k", RULE, t0 + 3);
-    expect(blocked.ok).toBe(false);
-    if (!blocked.ok) {
-      // First attempt leaves the window 60s after t0.
-      expect(blocked.retryAfterSeconds).toBe(60);
-    }
+  beforeEach(() => {
+    selectRows.length = 0;
+    vi.clearAllMocks();
   });
 
-  it("frees slots as attempts age out of the window", () => {
-    const t0 = 1_000_000;
-    for (let i = 0; i < 3; i++) checkRateLimit("k", RULE, t0);
-    // Attempts at exactly the window edge still count…
-    expect(checkRateLimit("k", RULE, t0 + RULE.windowMs).ok).toBe(false);
-    // …and age out one tick later.
-    expect(checkRateLimit("k", RULE, t0 + RULE.windowMs + 1).ok).toBe(true);
+  it("records an allowed attempt in a serialized transaction", async () => {
+    const now = new Date("2026-01-01T00:00:00Z");
+    await expect(checkRateLimit("signup:ip", RULE, now)).resolves.toEqual({
+      ok: true,
+    });
+
+    expect(dbMock.transaction).toHaveBeenCalledOnce();
+    expect(tx.execute).toHaveBeenCalledOnce();
+    expect(insertValues).toHaveBeenCalledWith({
+      key: "signup:ip",
+      expiresAt: new Date("2026-01-01T00:01:00Z"),
+      createdAt: now,
+    });
   });
 
-  it("tracks keys independently", () => {
-    const t0 = 1_000_000;
-    for (let i = 0; i < 3; i++) checkRateLimit("a", RULE, t0 + i);
-    expect(checkRateLimit("a", RULE, t0 + 4).ok).toBe(false);
-    expect(checkRateLimit("b", RULE, t0 + 4).ok).toBe(true);
+  it("blocks at the limit and returns the earliest expiry", async () => {
+    selectRows.push(
+      { expiresAt: new Date("2026-01-01T00:00:20Z") },
+      { expiresAt: new Date("2026-01-01T00:00:30Z") },
+      { expiresAt: new Date("2026-01-01T00:00:40Z") },
+    );
+
+    await expect(
+      checkRateLimit("signup:ip", RULE, new Date("2026-01-01T00:00:00Z")),
+    ).resolves.toEqual({ ok: false, retryAfterSeconds: 20 });
+    expect(insertValues).not.toHaveBeenCalled();
   });
 });
 
@@ -47,7 +76,11 @@ describe("clientIp", () => {
 
   it("falls back to x-real-ip, then unknown", () => {
     expect(
-      clientIp(new Request("http://x", { headers: { "x-real-ip": "198.51.100.4" } })),
+      clientIp(
+        new Request("http://x", {
+          headers: { "x-real-ip": "198.51.100.4" },
+        }),
+      ),
     ).toBe("198.51.100.4");
     expect(clientIp(new Request("http://x"))).toBe("unknown");
   });

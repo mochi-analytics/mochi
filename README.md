@@ -7,7 +7,10 @@
 Self-hosted analytics for Discord bots: command usage, server growth, and bot
 health in one dashboard.
 
-Full documentation: **[docs.mochis.dev](https://docs.mochis.dev)**
+Full documentation: **[mochi.software](https://mochi.software)**
+
+Don't want to self-host? A cloud-hosted instance is available at
+**[cloud.mochi.software](https://cloud.mochi.software)**.
 
 ## Features
 
@@ -25,7 +28,7 @@ Full documentation: **[docs.mochis.dev](https://docs.mochis.dev)**
 
 ## Self-Hosting
 
-See the [self-hosting guide](https://docs.mochis.dev/self-hosting).
+See the [self-hosting guide](https://mochi.software/self-hosting).
 
 ```sh
 POSTGRES_PASSWORD=... CLICKHOUSE_PASSWORD=... \
@@ -40,14 +43,19 @@ ghcr.io/mochi-analytics/mochi
 
 ## Cloud Mode
 
-Set `MOCHI_CLOUD=1` to run a shared, multi-tenant instance:
+We run a hosted, multi-tenant instance at
+**[cloud.mochi.software](https://cloud.mochi.software)** — sign up there to use
+Mochi without hosting it yourself.
 
-- `/signup` opens for self-service registration (new accounts get the
-  `user` role; the operator's admin account still comes from first-run
-  `/setup`)
+To run your own shared instance, set `MOCHI_CLOUD=1`:
+
+- `/signup` uses Discord OAuth and requires Discord to report a verified,
+  unique email address (new accounts get the `user` role; the operator's
+  admin account still comes from first-run `/setup`)
 - each non-admin account is limited to 1 owned bot and 1 owned team
 - data retention is capped at 183 days (half a year) for non-admin accounts
-- login and signup are rate-limited per IP
+- login and Discord OAuth are rate-limited per IP in Postgres and protected
+  by Cloudflare Turnstile
 
 Self-hosted instances are unaffected: signups stay closed and no quotas,
 caps, or rate limits apply.
@@ -67,14 +75,30 @@ docker compose --project-directory . -f docker/docker-compose.cloud.yml up -d --
 
 Set `MOCHI_PORT` to publish a different host port.
 
+Cloud mode also requires a Discord application and a free Cloudflare
+Turnstile widget. Add this exact redirect URL to the Discord application's
+OAuth2 redirects, then provide all five values to the cloud stack:
+
+```sh
+DISCORD_CLIENT_ID=...
+DISCORD_CLIENT_SECRET=...
+DISCORD_REDIRECT_URI=https://your-domain.example/api/auth/discord/callback
+TURNSTILE_SITE_KEY=...
+TURNSTILE_SECRET_KEY=...
+```
+
+The Turnstile widget must allow the hostname serving Mochi. Password login is
+kept for the operator and accounts created before Discord OAuth was enabled;
+new cloud accounts are OAuth-only.
+
 ## Instrumentation
 
-- [discord.js SDK](https://docs.mochis.dev/sdks/discordjs)
-- [discord.py SDK](https://docs.mochis.dev/sdks/discordpy)
-- [discordgo SDK](https://docs.mochis.dev/sdks/go)
-- [Raw ingest API](https://docs.mochis.dev/ingest-api) - for any other language
+- [discord.js SDK](https://mochi.software/sdks/discordjs)
+- [discord.py SDK](https://mochi.software/sdks/discordpy)
+- [discordgo SDK](https://mochi.software/sdks/go)
+- [Raw ingest API](https://mochi.software/ingest-api) - for any other language
 
-All SDKs: [docs.mochis.dev/sdks](https://docs.mochis.dev/sdks)
+All SDKs: [mochi.software/sdks](https://mochi.software/sdks)
 
 ## Development
 

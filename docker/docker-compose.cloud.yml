@@ -10,6 +10,11 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       MOCHI_CLOUD: "1"
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
+      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI}
+      TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY}
       DATABASE_URL: postgres://mochi:${SERVICE_PASSWORD_64_POSTGRES}@postgres:5432/mochi
       CLICKHOUSE_URL: http://clickhouse:8123
       CLICKHOUSE_USER: mochi

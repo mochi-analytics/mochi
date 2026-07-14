@@ -19,7 +19,7 @@ const LOGIN_RULE = { limit: 10, windowMs: 15 * 60 * 1000 };
 
 export async function POST(req: Request) {
   if (isCloud()) {
-    const limited = rateLimitResponse(req, "login", LOGIN_RULE);
+    const limited = await rateLimitResponse(req, "login", LOGIN_RULE);
     if (limited) return limited;
   }
 

@@ -69,6 +69,9 @@ export async function PATCH(req: Request) {
   }
 
   if (newPassword) {
+    if (!auth.user.passwordHash) {
+      return jsonError(400, "This account signs in with Discord");
+    }
     const valid = await verifyPassword(
       currentPassword ?? "",
       auth.user.passwordHash,
