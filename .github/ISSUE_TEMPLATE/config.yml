@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Discord community
+    url: https://discord.gg/59z89Ke4bt
+    about: Questions, help, and general chat — the fastest way to reach us.
   - name: Security issue
     url: https://github.com/mochi-analytics/mochi/security/advisories/new
     about: Please report security vulnerabilities privately.

@@ -4,6 +4,12 @@
 
 # Mochi
 
+<p align="center">
+  <a href="https://discord.gg/59z89Ke4bt"><img src="https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&logoColor=white" alt="Join the Mochi Discord"></a>
+  <a href="https://mochi.software"><img src="https://img.shields.io/badge/Docs-mochi.software-EC4899" alt="Documentation"></a>
+  <a href="https://cloud.mochi.software"><img src="https://img.shields.io/badge/Cloud-cloud.mochi.software-EC4899" alt="Mochi Cloud"></a>
+</p>
+
 Self-hosted analytics for Discord bots: command usage, server growth, and bot
 health in one dashboard.
 
@@ -99,6 +105,13 @@ new cloud accounts are OAuth-only.
 - [Raw ingest API](https://mochi.software/ingest-api) - for any other language
 
 All SDKs: [mochi.software/sdks](https://mochi.software/sdks)
+
+## Community
+
+Questions, bug reports, or feature ideas? Join the
+[Mochi Discord](https://discord.gg/59z89Ke4bt) — the fastest way to get help and
+talk to the people building Mochi. You can also
+[open an issue](https://github.com/mochi-analytics/mochi/issues).
 
 ## Development
 
