@@ -52,6 +52,21 @@ Set `MOCHI_CLOUD=1` to run a shared, multi-tenant instance:
 Self-hosted instances are unaffected: signups stay closed and no quotas,
 caps, or rate limits apply.
 
+The cloud branch has a dedicated Coolify Compose stack that builds the current
+checkout, enables cloud mode, and publishes the app on port 3000 by default.
+Coolify generates and persists separate 64-character passwords for Postgres
+and ClickHouse through its `SERVICE_PASSWORD_64_*` magic variables.
+
+To render or run this stack outside Coolify, supply those two variables
+yourself:
+
+```sh
+SERVICE_PASSWORD_64_POSTGRES=... SERVICE_PASSWORD_64_CLICKHOUSE=... \
+docker compose -f docker/docker-compose.cloud.yml up -d --build
+```
+
+Set `MOCHI_PORT` to publish a different host port.
+
 ## Instrumentation
 
 - [discord.js SDK](https://docs.mochis.dev/sdks/discordjs)
