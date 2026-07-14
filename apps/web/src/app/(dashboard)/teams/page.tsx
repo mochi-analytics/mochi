@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { TeamsList } from "@/components/teams/teams-list";
 import { getCurrentUser } from "@/lib/auth/session";
+import { teamQuotaFor } from "@/lib/deployment";
 import { listTeamsForUser } from "@/lib/teams";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +11,10 @@ export default async function TeamsPage() {
   if (!user) redirect("/login");
 
   const teams = await listTeamsForUser(user);
-  const canCreate = user.role !== "viewer";
+  const quota = teamQuotaFor(user.role);
+  const ownedCount = teams.filter((t) => t.isOwner).length;
+  const atQuota = quota !== null && ownedCount >= quota;
+  const canCreate = user.role !== "viewer" && !atQuota;
 
   return (
     <div className="space-y-8">
@@ -22,6 +26,14 @@ export default async function TeamsPage() {
       </div>
 
       <TeamsList teams={teams} canCreate={canCreate} />
+
+      {user.role !== "viewer" && atQuota && (
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          Your account includes {quota === 1 ? "1 team" : `${quota} teams`} (
+          {ownedCount} of {quota} used). You can still join other teams with an
+          access code.
+        </p>
+      )}
     </div>
   );
 }

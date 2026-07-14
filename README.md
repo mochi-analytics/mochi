@@ -38,6 +38,20 @@ Docker image:
 ghcr.io/mochi-analytics/mochi
 ```
 
+## Cloud Mode
+
+Set `MOCHI_CLOUD=1` to run a shared, multi-tenant instance:
+
+- `/signup` opens for self-service registration (new accounts get the
+  `user` role; the operator's admin account still comes from first-run
+  `/setup`)
+- each non-admin account is limited to 1 owned bot and 1 owned team
+- data retention is capped at 183 days (half a year) for non-admin accounts
+- login and signup are rate-limited per IP
+
+Self-hosted instances are unaffected: signups stay closed and no quotas,
+caps, or rate limits apply.
+
 ## Instrumentation
 
 - [discord.js SDK](https://docs.mochis.dev/sdks/discordjs)

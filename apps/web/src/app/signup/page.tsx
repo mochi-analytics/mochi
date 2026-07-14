@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthCard } from "@/components/auth-card";
-import { LoginForm } from "@/components/login-form";
+import { SignupForm } from "@/components/signup-form";
 import { getCurrentUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
@@ -9,7 +9,9 @@ import { isCloud } from "@/lib/deployment";
 
 export const dynamic = "force-dynamic";
 
-export default async function LoginPage() {
+export default async function SignupPage() {
+  if (!isCloud()) redirect("/login");
+
   const anyUser = await db.select({ id: users.id }).from(users).limit(1);
   if (anyUser.length === 0) redirect("/setup");
 
@@ -17,16 +19,17 @@ export default async function LoginPage() {
   if (user) redirect("/bots");
 
   return (
-    <AuthCard title="Sign in to Mochi" subtitle="Analytics for your Discord bots.">
-      <LoginForm />
-      {isCloud() && (
-        <p className="mt-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
-          New here?{" "}
-          <Link href="/signup" className="font-medium underline hover:no-underline">
-            Create an account
-          </Link>
-        </p>
-      )}
+    <AuthCard
+      title="Create your Mochi account"
+      subtitle="Analytics for your Discord bots."
+    >
+      <SignupForm />
+      <p className="mt-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
+        Already have an account?{" "}
+        <Link href="/login" className="font-medium underline hover:no-underline">
+          Sign in
+        </Link>
+      </p>
     </AuthCard>
   );
 }

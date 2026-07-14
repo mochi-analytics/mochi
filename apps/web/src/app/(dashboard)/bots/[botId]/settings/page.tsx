@@ -11,6 +11,7 @@ import {
 } from "@/components/settings-panels";
 import { getAccessibleBot } from "@/lib/auth/access";
 import { getCurrentUser } from "@/lib/auth/session";
+import { retentionCapFor } from "@/lib/deployment";
 import { db } from "@/lib/db";
 import { alertConfigs, apiKeys, botSettings } from "@/lib/db/schema";
 import { listTeamsForBot, listTeamsForUser } from "@/lib/teams";
@@ -134,6 +135,7 @@ export default async function BotSettingsPage({
         <RetentionForm
           botId={bot.id}
           retentionDays={settings?.retentionDays ?? 395}
+          maxDays={retentionCapFor(user.role) ?? 3650}
         />
       </section>
 

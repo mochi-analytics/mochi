@@ -1,10 +1,12 @@
 import { randomBytes } from "node:crypto";
+import { count, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { jsonError, parseBody, requireUser } from "@/lib/api";
 import { listAccessibleBots } from "@/lib/auth/access";
 import { db } from "@/lib/db";
-import { bots, botSettings, teamBots } from "@/lib/db/schema";
+import { bots, botSettings, teamBots, users } from "@/lib/db/schema";
+import { botQuotaFor, retentionCapFor } from "@/lib/deployment";
 import { getTeamForUser } from "@/lib/teams";
 
 export async function GET() {
@@ -42,7 +44,23 @@ export async function POST(req: Request) {
     return jsonError(404, "Team not found");
   }
 
+  const quota = botQuotaFor(auth.user.role);
+
   const bot = await db.transaction(async (tx) => {
+    if (quota !== null) {
+      // Lock the user row so concurrent creates serialize on the quota check.
+      await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, auth.user.id))
+        .for("update");
+      const [owned] = await tx
+        .select({ n: count() })
+        .from(bots)
+        .where(eq(bots.ownerUserId, auth.user.id));
+      if (Number(owned?.n ?? 0) >= quota) return null;
+    }
+
     const [created] = await tx
       .insert(bots)
       .values({
@@ -51,15 +69,27 @@ export async function POST(req: Request) {
         ownerUserId: auth.user.id,
       })
       .returning();
+    const retentionCap = retentionCapFor(auth.user.role);
     await tx.insert(botSettings).values({
       botId: created.id,
       userHashSalt: randomBytes(16).toString("hex"),
+      // Capped accounts start at their ceiling instead of the 395 default.
+      ...(retentionCap !== null ? { retentionDays: retentionCap } : {}),
     });
     if (teamId) {
       await tx.insert(teamBots).values({ teamId, botId: created.id });
     }
     return created;
   });
+
+  if (!bot) {
+    return jsonError(
+      403,
+      quota === 1
+        ? "Your account is limited to 1 bot"
+        : `Your account is limited to ${quota} bots`,
+    );
+  }
 
   return NextResponse.json({ bot }, { status: 201 });
 }

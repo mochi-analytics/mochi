@@ -209,9 +209,11 @@ export function TeamSharePanel({
 export function RetentionForm({
   botId,
   retentionDays,
+  maxDays = 3650,
 }: {
   botId: string;
   retentionDays: number;
+  maxDays?: number;
 }) {
   const router = useRouter();
   const [days, setDays] = useState(String(retentionDays));
@@ -240,12 +242,14 @@ export function RetentionForm({
         className={`${inputClass} max-w-32`}
         type="number"
         min={7}
-        max={3650}
+        max={maxDays}
         value={days}
         onChange={(e) => setDays(e.target.value)}
         required
       />
-      <span className="text-sm text-zinc-500 dark:text-zinc-400">days</span>
+      <span className="text-sm text-zinc-500 dark:text-zinc-400">
+        days{maxDays < 3650 ? ` (up to ${maxDays})` : ""}
+      </span>
       <button
         className="inline-flex items-center gap-1 rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
         disabled={busy}

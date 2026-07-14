@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { CreateBotForm } from "@/components/create-bot-form";
 import { listAccessibleBots } from "@/lib/auth/access";
 import { getCurrentUser } from "@/lib/auth/session";
+import { botQuotaFor } from "@/lib/deployment";
 import { listTeamsForUser } from "@/lib/teams";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,10 @@ export default async function BotsPage() {
     listAccessibleBots(user),
     canCreate ? listTeamsForUser(user) : Promise.resolve([]),
   ]);
+
+  const quota = botQuotaFor(user.role);
+  const ownedCount = rows.filter((b) => b.ownerUserId === user.id).length;
+  const atQuota = quota !== null && ownedCount >= quota;
 
   return (
     <div className="space-y-8">
@@ -58,13 +63,20 @@ export default async function BotsPage() {
         </ul>
       )}
 
-      {canCreate && (
+      {canCreate && !atQuota && (
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm">
           <h2 className="mb-4 text-sm font-semibold">Add a bot</h2>
           <CreateBotForm
             teams={teams.map((t) => ({ id: t.id, name: t.name }))}
           />
         </div>
+      )}
+
+      {canCreate && atQuota && (
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          Your account includes {quota === 1 ? "1 bot" : `${quota} bots`} (
+          {ownedCount} of {quota} used). Delete a bot to add a different one.
+        </p>
       )}
     </div>
   );
