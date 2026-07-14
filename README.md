@@ -62,7 +62,7 @@ yourself:
 
 ```sh
 SERVICE_PASSWORD_64_POSTGRES=... SERVICE_PASSWORD_64_CLICKHOUSE=... \
-docker compose -f docker/docker-compose.cloud.yml up -d --build
+docker compose --project-directory . -f docker/docker-compose.cloud.yml up -d --build
 ```
 
 Set `MOCHI_PORT` to publish a different host port.

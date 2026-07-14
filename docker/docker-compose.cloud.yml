@@ -5,7 +5,8 @@ name: mochi-cloud
 services:
   mochi:
     build:
-      context: ..
+      # Coolify sets the Compose project directory to the repository root.
+      context: .
       dockerfile: docker/Dockerfile
     environment:
       MOCHI_CLOUD: "1"
