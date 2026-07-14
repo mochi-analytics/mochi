@@ -19,7 +19,7 @@ services:
       RETENTION_CLEANUP: "1"
       ALERTS: "1"
     ports:
-      - "${MOCHI_PORT:-3000}:3000"
+      - "3000"
     healthcheck:
       test:
         [
