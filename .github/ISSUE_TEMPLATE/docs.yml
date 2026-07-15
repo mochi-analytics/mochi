@@ -8,7 +8,7 @@ body:
     attributes:
       label: Page or section
       description: Link the doc page or name the missing section.
-      placeholder: https://docs.mochis.dev/self-hosting, https://docs.mochis.dev/ingest-api, README.md, ...
+      placeholder: https://mochi.software/self-hosting, https://mochi.software/ingest-api, README.md, ...
     validations:
       required: true
   - type: textarea

@@ -1,6 +1,7 @@
 import {
   boolean,
   integer,
+  index,
   pgTable,
   primaryKey,
   text,
@@ -11,7 +12,11 @@ import {
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   username: text("username").notNull().unique(),
-  passwordHash: text("password_hash").notNull(),
+  passwordHash: text("password_hash"),
+  // Cloud accounts authenticate through Discord. Both values are nullable so
+  // existing/self-hosted password accounts remain valid.
+  email: text("email").unique(),
+  discordUserId: text("discord_user_id").unique(),
   role: text("role", { enum: ["admin", "user", "viewer"] })
     .notNull()
     .default("user"),
@@ -27,6 +32,24 @@ export const users = pgTable("users", {
     .notNull()
     .defaultNow(),
 });
+
+/**
+ * Durable sliding-window rate-limit events. Each row expires at the end of
+ * the window that created it, which lets any request safely clean up rows
+ * belonging to rules with different window lengths.
+ */
+export const rateLimitAttempts = pgTable(
+  "rate_limit_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    key: text("key").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("rate_limit_attempts_key_expires_idx").on(t.key, t.expiresAt)],
+);
 
 export const sessions = pgTable("sessions", {
   // sha256 hex of the session token; the raw token only lives in the cookie

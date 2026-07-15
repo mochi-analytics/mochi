@@ -13,11 +13,16 @@ export default async function ProfilePage() {
       <div>
         <h1 className="text-2xl font-semibold">Profile</h1>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Your username, role, and password.
+          Your account identity and access settings.
         </p>
       </div>
 
-      <ProfileForm username={user.username} role={user.role} />
+      <ProfileForm
+        username={user.username}
+        role={user.role}
+        email={user.email}
+        hasPassword={user.passwordHash !== null}
+      />
     </div>
   );
 }

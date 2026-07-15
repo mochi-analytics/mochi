@@ -14,16 +14,32 @@ import type { Role } from "@/lib/admin";
 export function ProfileForm({
   username,
   role,
+  email,
+  hasPassword,
 }: {
   username: string;
   role: Role;
+  email: string | null;
+  hasPassword: boolean;
 }) {
   return (
     <div className="space-y-6">
       <UsernameCard currentUsername={username} />
       <RoleCard role={role} />
-      <PasswordCard />
+      {email && <DiscordCard email={email} />}
+      {hasPassword && <PasswordCard />}
     </div>
+  );
+}
+
+function DiscordCard({ email }: { email: string }) {
+  return (
+    <Card
+      title="Discord account"
+      description="Your verified Discord email is the unique identity for this cloud account."
+    >
+      <p className="text-sm text-zinc-700 dark:text-zinc-300">{email}</p>
+    </Card>
   );
 }
 
@@ -62,7 +78,7 @@ function UsernameCard({ currentUsername }: { currentUsername: string }) {
   return (
     <Card
       title="Username"
-      description="This is how you sign in and how others in your teams see you."
+      description="This is how other people in your teams see you."
     >
       <form onSubmit={onSubmit} className="space-y-3">
         <Field label="Username" htmlFor="settings-username">

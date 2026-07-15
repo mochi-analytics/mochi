@@ -6,13 +6,23 @@ import { verifyPassword } from "@/lib/auth/password";
 import { createSession } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
+import { isCloud } from "@/lib/deployment";
+import { rateLimitResponse } from "@/lib/rate-limit";
 
 const bodySchema = z.object({
   username: z.string().min(1).max(32),
   password: z.string().min(1).max(128),
 });
 
+// 10 attempts per 15 minutes per IP, cloud only.
+const LOGIN_RULE = { limit: 10, windowMs: 15 * 60 * 1000 };
+
 export async function POST(req: Request) {
+  if (isCloud()) {
+    const limited = await rateLimitResponse(req, "login", LOGIN_RULE);
+    if (limited) return limited;
+  }
+
   const parsed = await parseBody(req, bodySchema);
   if ("response" in parsed) return parsed.response;
   const { username, password } = parsed.data;
