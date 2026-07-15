@@ -21,6 +21,12 @@ export function formatPercent(value: number): string {
   return `${value.toFixed(1)}%`;
 }
 
+/** Resident memory in megabytes → "512 MB" / "1.5 GB". */
+export function formatMemMb(mb: number): string {
+  if (mb <= 0) return "—";
+  return mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${Math.round(mb)} MB`;
+}
+
 export function formatTick(t: number, bucket: "minute" | "hour" | "day"): string {
   const date = new Date(t);
   if (bucket === "day") {

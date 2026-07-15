@@ -6,13 +6,16 @@ import { StatTile } from "@/components/stat-tile";
 import { getCurrentUser } from "@/lib/auth/session";
 import {
   formatCompact,
+  formatMemMb,
   formatMs,
   formatNumber,
+  formatPercent,
   formatRelative,
 } from "@/lib/format";
 import {
   RANGES,
   getPingSeries,
+  getResourceSeries,
   getShardStatuses,
   getUptime,
   parseRange,
@@ -36,9 +39,10 @@ export default async function HealthPage({
   const range = parseRange((await searchParams).range, user?.defaultRange);
   const { bucket } = RANGES[range];
 
-  const [shards, pingSeries, uptime] = await Promise.all([
+  const [shards, pingSeries, resourceSeries, uptime] = await Promise.all([
     getShardStatuses(botId),
     getPingSeries(botId, range),
+    getResourceSeries(botId, range),
     getUptime(botId, range),
   ]);
 
@@ -61,6 +65,13 @@ export default async function HealthPage({
   const totalGuilds = shards.reduce((sum, s) => sum + s.guilds, 0);
   const latestPing = online.length
     ? Math.round(online.reduce((sum, s) => sum + s.ping, 0) / online.length)
+    : 0;
+  // CPU is per-process, so sum across online shards for a fleet-wide figure;
+  // memory likewise. Gated on any shard actually reporting resources.
+  const hasResources = shards.some((s) => s.mem > 0);
+  const totalMem = online.reduce((sum, s) => sum + s.mem, 0);
+  const avgCpu = online.length
+    ? online.reduce((sum, s) => sum + s.cpu, 0) / online.length
     : 0;
 
   return (
@@ -96,6 +107,15 @@ export default async function HealthPage({
         />
         <StatTile label="Gateway ping" value={formatMs(latestPing)} />
         <StatTile label="Servers" value={formatCompact(totalGuilds)} />
+        {hasResources && (
+          <>
+            <StatTile
+              label="CPU (avg/shard)"
+              value={online.length ? formatPercent(avgCpu) : "—"}
+            />
+            <StatTile label="Memory" value={formatMemMb(totalMem)} />
+          </>
+        )}
       </div>
 
       <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
@@ -116,6 +136,56 @@ export default async function HealthPage({
         )}
       </div>
 
+      {hasResources && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
+            <h2 className="mb-4 text-sm font-semibold">
+              CPU{" "}
+              <span className="font-normal text-zinc-400 dark:text-zinc-500">
+                (% of all cores)
+              </span>
+            </h2>
+            {resourceSeries.length > 1 ? (
+              <MultiLineChart
+                data={resourceSeries}
+                bucket={bucket}
+                series={[
+                  { key: "cpuAvg", label: "Average", color: viz.commands },
+                  { key: "cpuMax", label: "Peak", color: viz.errors },
+                ]}
+              />
+            ) : (
+              <p className="py-10 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                Not enough snapshots with resource data in this period.
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
+            <h2 className="mb-4 text-sm font-semibold">
+              Memory{" "}
+              <span className="font-normal text-zinc-400 dark:text-zinc-500">
+                (RSS, MB)
+              </span>
+            </h2>
+            {resourceSeries.length > 1 ? (
+              <MultiLineChart
+                data={resourceSeries}
+                bucket={bucket}
+                series={[
+                  { key: "memAvg", label: "Average", color: viz.joins },
+                  { key: "memMax", label: "Peak", color: viz.errors },
+                ]}
+              />
+            ) : (
+              <p className="py-10 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                Not enough snapshots with resource data in this period.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
         <div className="border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 text-sm font-semibold">
           Shards
@@ -128,6 +198,12 @@ export default async function HealthPage({
               <th className="px-4 py-2 text-right font-medium">Servers</th>
               <th className="px-4 py-2 text-right font-medium">~Members</th>
               <th className="px-4 py-2 text-right font-medium">Ping</th>
+              {hasResources && (
+                <>
+                  <th className="px-4 py-2 text-right font-medium">CPU</th>
+                  <th className="px-4 py-2 text-right font-medium">Memory</th>
+                </>
+              )}
               <th className="px-4 py-2 text-right font-medium">Last snapshot</th>
             </tr>
           </thead>
@@ -167,6 +243,16 @@ export default async function HealthPage({
                     {shard.members > 0 ? formatCompact(shard.members) : "—"}
                   </td>
                   <td className="px-4 py-2.5 text-right">{formatMs(shard.ping)}</td>
+                  {hasResources && (
+                    <>
+                      <td className="px-4 py-2.5 text-right">
+                        {shard.mem > 0 ? formatPercent(shard.cpu) : "—"}
+                      </td>
+                      <td className="px-4 py-2.5 text-right">
+                        {formatMemMb(shard.mem)}
+                      </td>
+                    </>
+                  )}
                   <td className="px-4 py-2.5 text-right text-zinc-500 dark:text-zinc-400">
                     {formatRelative(shard.lastSeen)}
                   </td>

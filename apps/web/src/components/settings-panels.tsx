@@ -37,6 +37,10 @@ export function SharePanel({
     <div className="space-y-3">
       {shareId ? (
         <>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Show off your bot: drop the badge or widget below on your GitHub
+            README or bot-list page.
+          </p>
           <code className="block break-all rounded bg-zinc-50 p-2 font-mono text-xs dark:bg-zinc-800">
             {shareUrl ?? `/share/${shareId}`}
           </code>
@@ -55,7 +59,7 @@ export function SharePanel({
               className="h-5"
             />
             <code className="block break-all rounded bg-zinc-50 p-2 font-mono text-xs dark:bg-zinc-800">
-              {`![servers](${origin}/api/badge/${shareId}?metric=servers)`}
+              {`[![servers](${origin}/api/badge/${shareId}?metric=servers)](${shareUrl ?? `${origin}/share/${shareId}`})`}
             </code>
           </div>
 
@@ -80,13 +84,19 @@ export function SharePanel({
           </button>
         </>
       ) : (
-        <button
-          onClick={() => toggle(true)}
-          disabled={busy}
-          className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-        >
-          Enable public share link
-        </button>
+        <>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Publish a read-only stats page, README badge, and embeddable widget
+            for this bot.
+          </p>
+          <button
+            onClick={() => toggle(true)}
+            disabled={busy}
+            className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          >
+            Enable public share link
+          </button>
+        </>
       )}
     </div>
   );

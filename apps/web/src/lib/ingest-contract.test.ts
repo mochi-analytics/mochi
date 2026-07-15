@@ -102,4 +102,23 @@ describe("snapshotSchema", () => {
   it("rejects totalShards of zero", () => {
     expect(snapshotSchema.safeParse({ guildCount: 1, totalShards: 0 }).success).toBe(false);
   });
+
+  it("accepts fractional cpuPercent and integer memoryMb", () => {
+    expect(
+      snapshotSchema.safeParse({ guildCount: 1, cpuPercent: 12.5, memoryMb: 256 })
+        .success,
+    ).toBe(true);
+  });
+
+  it("rejects a negative cpuPercent", () => {
+    expect(
+      snapshotSchema.safeParse({ guildCount: 1, cpuPercent: -1 }).success,
+    ).toBe(false);
+  });
+
+  it("rejects a fractional memoryMb", () => {
+    expect(
+      snapshotSchema.safeParse({ guildCount: 1, memoryMb: 12.5 }).success,
+    ).toBe(false);
+  });
 });

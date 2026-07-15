@@ -51,6 +51,10 @@ export const snapshotSchema = z.object({
   totalShards: z.number().int().min(1).max(65536).optional(),
   approximateMemberSum: z.number().int().min(0).optional(),
   wsPingMs: z.number().int().min(0).optional(),
+  /** Process CPU usage, normalized to 0-100 across all cores. */
+  cpuPercent: z.number().min(0).max(100_000).optional(),
+  /** Process resident set size in whole megabytes. */
+  memoryMb: z.number().int().min(0).max(4_194_304).optional(),
   ts: z.string().datetime({ offset: true }).optional(),
 });
 

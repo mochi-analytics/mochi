@@ -4,6 +4,7 @@ import { z } from "zod";
 import { MochiLogo } from "@/components/mochi-logo";
 import { OverviewDashboard } from "@/components/overview-dashboard";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { mochiAttributionUrl } from "@/lib/brand";
 import { db } from "@/lib/db";
 import { bots } from "@/lib/db/schema";
 import { parseRange } from "@/lib/queries";
@@ -38,9 +39,14 @@ export default async function SharePage({
             {bot.name}
           </span>
           <span className="flex items-center gap-3">
-            <span className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500">
+            <a
+              href={mochiAttributionUrl("share")}
+              target="_blank"
+              rel="noopener"
+              className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+            >
               stats by <MochiLogo className="h-3.5 w-3.5" /> Mochi
-            </span>
+            </a>
             <ThemeToggle />
           </span>
         </div>

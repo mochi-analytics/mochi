@@ -478,6 +478,8 @@ export async function getShardStatuses(botId: string) {
     guilds: string;
     members: string;
     ping: string;
+    cpu: string;
+    mem: string;
     totalShards: number;
     lastSeen: string;
   }>(
@@ -485,6 +487,8 @@ export async function getShardStatuses(botId: string) {
             argMax(guild_count, created_at) AS guilds,
             argMax(approximate_member_sum, created_at) AS members,
             argMax(ws_ping_ms, created_at) AS ping,
+            argMax(cpu_pct, created_at) AS cpu,
+            argMax(mem_rss_mb, created_at) AS mem,
             argMax(total_shards, created_at) AS totalShards,
             max(created_at) AS lastSeen
      FROM guild_snapshots
@@ -498,8 +502,44 @@ export async function getShardStatuses(botId: string) {
     guilds: Number(row.guilds),
     members: Number(row.members),
     ping: Number(row.ping),
+    cpu: Number(row.cpu),
+    mem: Number(row.mem),
     totalShards: Number(row.totalShards),
     lastSeen: parseChDate(row.lastSeen),
+  }));
+}
+
+/**
+ * Average/peak process CPU (0-100 across all cores) and resident memory (MB)
+ * per bucket. Rows that never reported resources land as 0/0 on ingest, so we
+ * exclude them: a snapshot with mem_rss_mb = 0 predates or opts out of resource
+ * reporting and would otherwise drag the average toward zero. No zero-fill —
+ * gaps mean "no data", consistent with the ping series.
+ */
+export async function getResourceSeries(botId: string, range: Range) {
+  const { hours, bucket } = RANGES[range];
+  const raw = await rows<{
+    bucket: string;
+    cpuAvg: string;
+    cpuMax: string;
+    memAvg: string;
+    memMax: string;
+  }>(
+    `SELECT ${BUCKET_FN[bucket]}(created_at) AS bucket,
+            round(avg(cpu_pct), 1) AS cpuAvg, round(max(cpu_pct), 1) AS cpuMax,
+            round(avg(mem_rss_mb)) AS memAvg, max(mem_rss_mb) AS memMax
+     FROM guild_snapshots
+     WHERE bot_id = {botId:UUID} AND mem_rss_mb > 0
+       AND created_at >= now64(3) - INTERVAL {hours:UInt32} HOUR
+     GROUP BY bucket ORDER BY bucket`,
+    { botId, hours },
+  );
+  return raw.map((row) => ({
+    t: parseChDate(row.bucket),
+    cpuAvg: Number(row.cpuAvg),
+    cpuMax: Number(row.cpuMax),
+    memAvg: Number(row.memAvg),
+    memMax: Number(row.memMax),
   }));
 }
 

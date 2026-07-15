@@ -34,6 +34,8 @@ export async function POST(req: Request) {
         guild_count: snapshot.guildCount,
         approximate_member_sum: snapshot.approximateMemberSum ?? 0,
         ws_ping_ms: snapshot.wsPingMs ?? 0,
+        cpu_pct: snapshot.cpuPercent ?? 0,
+        mem_rss_mb: snapshot.memoryMb ?? 0,
         created_at: (snapshot.ts ? new Date(snapshot.ts) : new Date())
           .toISOString()
           .replace("T", " ")
