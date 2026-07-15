@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.0](https://github.com/mochi-analytics/mochi/compare/mochi-v0.4.0...mochi-v0.5.0) (2026-07-15)
+
+
+### Features
+
+* **auth:** implement Discord OAuth flow with rate limiting and Turnstile verification ([85b37ad](https://github.com/mochi-analytics/mochi/commit/85b37ad6b5a9ac715fc998f200c07ea77bfcf774))
+* **cloud:** add Coolify Compose stack for cloud deployment with health checks ([2668ec7](https://github.com/mochi-analytics/mochi/commit/2668ec774ebd068fa91b006205d9fbc98e5d0aca))
+* **cloud:** implement cloud mode with user quotas and self-service signup ([59bfc6c](https://github.com/mochi-analytics/mochi/commit/59bfc6c002e3292359f754291ed73318d5666e2c))
+* **docs:** enhance README and issue template with Discord community links and documentation badge ([2809937](https://github.com/mochi-analytics/mochi/commit/280993737a17590ed782058b1122c8107c93cacb))
+* **metrics:** add CPU and memory metrics to health snapshots and dashboards ([bff6d3d](https://github.com/mochi-analytics/mochi/commit/bff6d3d20642b4201eca3a9d46d9d6d575582167))
+
+
+### Bug Fixes
+
+* **cloud:** set fixed port for mochi service in docker-compose ([5fbbf16](https://github.com/mochi-analytics/mochi/commit/5fbbf16e10938654625b7fe6132accddb30250a4))
+* **docker:** update project directory context for Coolify compatibility ([e64ce2a](https://github.com/mochi-analytics/mochi/commit/e64ce2ad10aa17fbaa72abecea4becfc7005ae9d))
+
 ## [0.4.0](https://github.com/mochi-analytics/mochi/compare/mochi-v0.3.2...mochi-v0.4.0) (2026-07-09)
 
 
